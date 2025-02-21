@@ -1,7 +1,4 @@
 # Source to run : > source run
-# idf_source should be an alias to : > source /path/to/esp-idf/export.sh
-# idf_all should be an alias to : > idf.py build && idf.py flash && idf.py monitor
+# Make sure that esp idf is sourced before-hand : > source /path/to/export.sh
 
-idf_source
-
-idf_all | python ./dump_reader.py stdin ./out
+idf.py build && idf.py flash && idf.py monitor | python ./dump_reader.py stdin ./out
