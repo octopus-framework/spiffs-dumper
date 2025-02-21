@@ -12,7 +12,7 @@ Be warned that this tool will upload a program into the connected esp32 and eras
 
 **You can keep this step if your current ESP32 setup has the default partition table.**
 
-Copy your csv file containing the partition table (usually `partitions.csv`). Set `CONFIG_PARTITION_TABLE_CUSTOM` to `y` using menu config. You can also do it manually in the `sdkconfig` file :
+- Copy your csv file containing the partition table (usually `partitions.csv`). Set `CONFIG_PARTITION_TABLE_CUSTOM` to `y` using menu config. You can also do it manually in the `sdkconfig` file :
 
 ```bash
 #
@@ -28,6 +28,12 @@ CONFIG_PARTITION_TABLE_OFFSET=0x8000
 CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 ```
+
+In  (`CMakeLists.txt`)[CMakeLists.txt], set the name of the partition you want to dump (default is `"data"`) :
+```cmake
+add_compile_definitions(PARITION_NAME="data")
+```
+Only one partition at a time can be dumped right now. This is planned to change in the future (react on the corresponding issue if this is a feature you would need). 
 
 ### Launch
 
@@ -47,7 +53,11 @@ The `dump_reader.py` will consume the ESP32 output, thus you wont be able to see
 
 ### Spiffs setup error
 
-This error might come from the fact that the partition table from the stored data is not the same as the partition table of this project. See the (Setup-partition)[#Setup-partition] section for more info.
+This error might come from :
+- The `PARTITION_NAME` macro definition in the CMake file is incorrect
+- The partition table from the stored data is not the same as the partition table of this project.
+
+See the (Setup-partition)[#Setup-partition] section to fix this issie.
 
 ## How does it work
 
