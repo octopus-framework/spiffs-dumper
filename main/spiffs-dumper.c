@@ -6,11 +6,14 @@
 #include <esp_spiffs.h>
 #include <mbedtls/base64.h>
 
+#ifndef PARITION_NAME
+#define PARITION_NAME "data"
+#endif
 
 bool init_spiffs() {
     esp_vfs_spiffs_conf_t spiffs_conf = {
-      .base_path = "/data",
-      .partition_label = "data",
+      .base_path = "/" PARITION_NAME,
+      .partition_label = PARITION_NAME,
       .max_files = 5,
       .format_if_mount_failed = false
     };
@@ -77,7 +80,7 @@ void listdir(const char *name) {
             listdir(path);
         } else {
             char path[1024];
-            snprintf(path, sizeof(path), "/data/%s", entry->d_name);
+            snprintf(path, sizeof(path), "/" PARITION_NAME "/%s", entry->d_name);
             dump_file(path);
         }
     }
@@ -86,13 +89,13 @@ void listdir(const char *name) {
 
 void app_main(void) {
     if (!init_spiffs()) {
-        printf("Could not init spiffs. Did you check the partition configuration ()?\n");
+        printf("Could not init spiffs. Did you check the partition configuration ? Partition name is set to '" PARITION_NAME "'\n");
         printf("@@SPIFFSERROR@@\n");
         return;
     }
 
     printf("@@DUMPBEGIN@@\n");
-    listdir("/data/");
+    listdir("/" PARITION_NAME "/");
     printf("@@DUMPEND@@\n");
 
     return;

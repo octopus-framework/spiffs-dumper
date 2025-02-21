@@ -18,7 +18,7 @@ outdir = sys.argv[2]
 line = dump.readline()
 while len(line) > 0 and line.strip() != b"@@DUMPBEGIN@@":
     if (line.strip() == b"@@SPIFFSERROR@@"):
-        print("Error while setting up spiffs ! Did you check the partition tables configuration (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/partition-tables.html)?")
+        print("Error while setting up spiffs. Run 'idf.py monitor' to troubleshoot. Did you check the partition name and partition table configuration (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/partition-tables.html)? ")
         exit(1)
 
     line = dump.readline()

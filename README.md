@@ -10,8 +10,6 @@ Be warned that this tool will upload a program into the connected esp32 and eras
 
 ### Setup partition
 
-**You can keep this step if your current ESP32 setup has the default partition table.**
-
 - Copy your csv file containing the partition table (usually `partitions.csv`). Set `CONFIG_PARTITION_TABLE_CUSTOM` to `y` using menu config. You can also do it manually in the `sdkconfig` file :
 
 ```bash
@@ -29,7 +27,7 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 ```
 
-In  (`CMakeLists.txt`)[CMakeLists.txt], set the name of the partition you want to dump (default is `"data"`) :
+- In  (`CMakeLists.txt`)[CMakeLists.txt], set the name of the partition you want to dump (default is `"data"`) :
 ```cmake
 add_compile_definitions(PARITION_NAME="data")
 ```
