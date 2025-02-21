@@ -59,8 +59,8 @@ See the (Setup-partition)[#Setup-partition] section to fix this issie.
 
 ## How does it work
 
-The tool basically uploads a program that will go through every file in the partition, prints their path and content, encoded in base64. On another hand, the dump_reader.py script will read the output, decode the base64 and rewrite the files into the ./out folder.
-For convenience sake, the files' contents are separated in blocks that are separately encoded in base64.
+The tool basically uploads a program that will go through every file in the partition, prints their path and content, encoded in base64. On another hand, the dump_reader.py script will read the output, decode the base64 and rewrite the files into the ./out folder. \
+For convenience sake, the files' contents are separated in blocks that are separately encoded in base64. \
 The program uses the chars `@@` as separators in order to pass instructions to the python script.
 
 ## Contribution
