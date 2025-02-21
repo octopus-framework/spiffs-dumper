@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <esp_spiffs.h>
+#include <mbedtls/base64.h>
 
 
 bool init_spiffs() {
@@ -11,7 +12,7 @@ bool init_spiffs() {
       .base_path = "/data",
       .partition_label = "data",
       .max_files = 5,
-      .format_if_mount_failed = true
+      .format_if_mount_failed = false
     };
 
     esp_err_t err = esp_vfs_spiffs_register(&spiffs_conf);
@@ -31,11 +32,36 @@ bool init_spiffs() {
     return true;
 }
 
-extern void dump_spiffs();
-extern void dump_file(const char* dir, const char* path);
+#define BLOCK_SIZE 0x100
+#define B64_BLOCK_SIZE 0x160
 
-void listdir(const char *name, int indent)
-{
+void dump_file(const char* path) {
+    char block[BLOCK_SIZE];
+    char b64Block[B64_BLOCK_SIZE];
+
+    FILE *fptr;
+    fptr = fopen(path, "r");
+    if (fptr == NULL)
+        return;
+
+    printf("%s", path);
+    printf("@@FILEBEG@@");
+    while (!feof(fptr) && !ferror(fptr)) {
+        size_t count = fread(block, sizeof(char), BLOCK_SIZE, fptr);
+
+        if (count > 0) {
+            size_t b64Count;
+            mbedtls_base64_encode((unsigned char *) b64Block, B64_BLOCK_SIZE, &b64Count, (unsigned char *) block, count);
+
+            printf("%*s", b64Count, b64Block);
+            printf("@@BLOCKEND@@");
+        }
+    }
+
+    printf("@@FILEEND@@");
+}
+
+void listdir(const char *name) {
     DIR *dir;
     struct dirent *entry;
 
@@ -48,27 +74,25 @@ void listdir(const char *name, int indent)
             if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                 continue;
             snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
-            printf("%*s[%s]\n", indent, "", entry->d_name);
-            listdir(path, indent + 2);
+            listdir(path);
         } else {
-            // File here
-            // printf("%*s- %s\n", indent, "", entry->d_name);
-            dump_file("/data/", entry->d_name); 
+            char path[1024];
+            snprintf(path, sizeof(path), "/data/%s", entry->d_name);
+            dump_file(path);
         }
     }
     closedir(dir);
 }
 
-void app_main(void)
-{
+void app_main(void) {
     if (!init_spiffs()) {
-        printf("Could not init spiffs\n");
+        printf("Could not init spiffs. Did you check the partition configuration ()?\n");
+        printf("@@SPIFFSERROR@@\n");
+        return;
     }
 
-    dump_spiffs();
-    
     printf("@@DUMPBEGIN@@\n");
-    listdir("/data/", 0);
+    listdir("/data/");
     printf("@@DUMPEND@@\n");
 
     return;

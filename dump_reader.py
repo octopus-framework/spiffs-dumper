@@ -2,6 +2,7 @@ import sys
 import os
 import base64
 
+# Input dump
 if len(sys.argv) < 3:
     print("Usage : python dump_reader.py [<dumpfile>|stdin] <outdir>")
     exit(1)
@@ -13,8 +14,13 @@ else:
 
 outdir = sys.argv[2]
 
+# Detect begin or errors
 line = dump.readline()
 while len(line) > 0 and line.strip() != b"@@DUMPBEGIN@@":
+    if (line.strip() == b"@@SPIFFSERROR@@"):
+        print("Error while setting up spiffs ! Did you check the partition tables configuration (https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/partition-tables.html)?")
+        exit(1)
+
     line = dump.readline()
 
 if len(line) == 0:
@@ -33,44 +39,9 @@ def readUntilSep(file):
 
     return ret[:-2]
 
-# def readUntilStop(file):
-#     ret = b""
-#     c = file.read(1)
-#     while c != b'\0':
-#         if len(c) == 0:
-#             raise RuntimeError("Could not find next \\0 char")
-#         
-#         ret += c
-#         if ret == b'@@DUMPEND@@':
-#             print("End of dump detected")
-#             if sys.argv[1] == "stdin":
-#                 print("Press Ctrl+] to end")
-#             exit(0)
-#
-#         c = file.read(1)
-#
-#     return ret
-
-# def readUntilPattern(file, pattern):
-#     ret = b""
-#     c = file.read(1)
-#     ret += c
-#     while ret[-len(pattern):] != pattern:
-#         if len(c) == 0:
-#             raise RuntimeError(f"Could not find pattern {pattern}")
-#
-#         c = file.read(1)
-#         ret += c
-#
-#     return ret[:-len(pattern)]
-#
-# try:
-#     readUntilSep(dump)
-# except Exception as err:
-#     raise RuntimeError("While getting first @@") from err
-#
 while True:
     try:
+        # Get next file path
         file_path = readUntilSep(dump).decode()
         if len(file_path) == 0:
             print("End reached")
@@ -90,7 +61,6 @@ while True:
     except Exception as e:
         raise RuntimeError("While getting file path") from e
 
-
     try:
         beg = readUntilSep(dump)
         if beg != b"FILEBEG":
@@ -103,6 +73,7 @@ while True:
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     f = open(file_path, "wb")
     
+    # Read, decode and write each blocks
     while True:
         content = readUntilSep(dump)
 
@@ -114,10 +85,4 @@ while True:
         else:
             print(f"Warning : unknown token '{token}' !!")
 
-
-    # more_content = readUntilPattern(dump, b'@@FILEEND@@')
-    # if len(more_content) != 0:
-    #     print(f"Warning : {len(more_content)} were detected before the next '@@FILEEND@@' token. There may be some garbage data.")
-    #     f.write(more_content)
-    
     f.close()
