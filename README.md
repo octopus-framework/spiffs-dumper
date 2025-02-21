@@ -45,6 +45,10 @@ This will dump the content of the spiffs partition to ./out.
 
 The `dump_reader.py` will consume the ESP32 output, thus you wont be able to see errors that could be printed by the ESP32. If this is the case, you may want to troubleshoot by launching `idf.py monitor` instead of `source run` to check the eventual errors.
 
+### Spiffs setup error
+
+This error might come from the fact that the partition table from the stored data is not the same as the partition table of this project. See the (Setup-partition)[#Setup-partition] section for more info.
+
 ## How does it work
 
 The tool basically uploads a program that will go through every file in the partition, prints their path and content, encoded in base64. On another hand, the dump_reader.py script will read the output, decode the base64 and rewrite the files into the ./out folder.
