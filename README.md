@@ -27,7 +27,7 @@ CONFIG_PARTITION_TABLE_MD5=y
 # end of Partition Table
 ```
 
-- In  (`CMakeLists.txt`)[CMakeLists.txt], set the name of the partition you want to dump (default is `"data"`) :
+- In  [`CMakeLists.txt`](CMakeLists.txt), set the name of the partition you want to dump (default is `"data"`) :
 ```cmake
 add_compile_definitions(PARITION_NAME="data")
 ```
@@ -55,7 +55,7 @@ This error might come from :
 - The `PARTITION_NAME` macro definition in the CMake file is incorrect
 - The partition table from the stored data is not the same as the partition table of this project.
 
-See the (Setup-partition)[#Setup-partition] section to fix this issie.
+See the [Setup-partition](#setup-partition) section to fix this issie.
 
 ## How does it work
 
